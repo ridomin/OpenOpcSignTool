@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Packaging;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
 namespace OpenVsixSignTool.Core.Tests
 {
-    public class OpcPackageTests : IDisposable
+    public class OpcPackageTests : PackageTestBase
     {
         private const string SamplePackage = @"sample\OpenVsixSignToolTest.vsix";
         private const string SamplePackageSigned = @"sample\OpenVsixSignToolTest-Signed.vsix";
@@ -135,24 +131,6 @@ namespace OpenVsixSignTool.Core.Tests
             {
                 Assert.NotEmpty(package.GetSignatures());
             }
-        }
-
-        private OpcPackage ShadowCopyPackage(string packagePath, out string path, OpcPackageFileMode mode = OpcPackageFileMode.Read)
-        {
-            var temp = Path.GetTempFileName();
-            _shadowFiles.Add(temp);
-            File.Copy(packagePath, temp, true);
-            path = temp;
-            return OpcPackage.Open(temp, mode);
-        }
-
-        public void Dispose()
-        {
-            void CleanUpShadows()
-            {
-                _shadowFiles.ForEach(File.Delete);
-            }
-            CleanUpShadows();
         }
     }
 }

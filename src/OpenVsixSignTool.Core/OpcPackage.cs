@@ -68,8 +68,14 @@ namespace OpenVsixSignTool.Core
             if (!_disposed)
             {
                 _disposed = true;
-                Flush();
-                _archive.Dispose();
+                try
+                {
+                    Flush();
+                }
+                finally
+                {
+                    _archive.Dispose();
+                }
             }
         }
 
@@ -91,7 +97,7 @@ namespace OpenVsixSignTool.Core
                 }
                 else
                 {
-                    var part = new OpcPart(this, entry.FullName, entry, _mode);
+                    var part = new OpcPart(this, entry.FullName, entry, _mode, false);
                     _partTracker.Add(entry.FullName, part);
                     yield return part;
                 }
@@ -117,7 +123,7 @@ namespace OpenVsixSignTool.Core
                 {
                     return null;
                 }
-                var part = new OpcPart(this, entry.FullName, entry, _mode);
+                var part = new OpcPart(this, entry.FullName, entry, _mode, false);
                 _partTracker.Add(path, part);
                 return part;
             }
@@ -131,9 +137,13 @@ namespace OpenVsixSignTool.Core
         /// <returns>An instance of the part just created.</returns>
         public OpcPart CreatePart(Uri partUri, string mimeType)
         {
+            if (_mode == OpcPackageFileMode.Read)
+            {
+                throw new InvalidOperationException("Cannot create a part in read only mode.");
+            }
             var path = partUri.ToPackagePath();
 
-            if (_archive.GetEntry(path) != null)
+            if (_partTracker.ContainsKey(path))
             {
                 throw new InvalidOperationException("The part already exists.");
             }
@@ -142,9 +152,8 @@ namespace OpenVsixSignTool.Core
             {
                 ContentTypes.Add(new OpcContentType(extension, mimeType.ToLower(), OpcContentTypeMode.Default));
             }
-            var zipEntry = _archive.CreateEntry(path, CompressionLevel.NoCompression);
-            var part = new OpcPart(this, zipEntry.FullName, zipEntry, _mode);
-            _partTracker.Add(zipEntry.FullName, part);
+            var part = new OpcPart(this, path, null, _mode, true);
+            _partTracker.Add(path, part);
             return part;
         }
 
@@ -156,6 +165,10 @@ namespace OpenVsixSignTool.Core
         public bool HasPart(Uri partUri)
         {
             var path = partUri.ToPackagePath();
+            if (_partTracker.ContainsKey(path))
+            {
+                return true;
+            }
             return _archive.GetEntry(path) != null;
         }
 
@@ -175,13 +188,14 @@ namespace OpenVsixSignTool.Core
             }
         }
 
-        /// <summary>
-        /// Flushes all changes of the package to disk. This automatically occurs when the <see cref="OpcPackage"/> is disposed.
-        /// </summary>
-        public void Flush()
+        internal void Flush()
         {
             foreach(var part in _partTracker.Values)
             {
+                if (part.IsVirtual)
+                {
+                    part.Materialize();
+                }
                 if (part._relationships?.IsDirty == true)
                 {
                     SaveRelationships(part._relationships);
