@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Packaging;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -26,17 +25,6 @@ namespace OpenVsixSignTool.Core.Tests
                 var builder = package.CreateSignatureBuilder();
                 builder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
                 builder.Sign(fileDigestAlgorithm, new X509Certificate2(pfxPath, "test"));
-            }
-            using (var netfxPackage = Package.Open(path, FileMode.Open))
-            {
-                var signatureManager = new PackageDigitalSignatureManager(netfxPackage);
-                Assert.Equal(VerifyResult.Success, signatureManager.VerifySignatures(true));
-                if (signatureManager.Signatures.Count != 1 || signatureManager.Signatures[0].SignedParts.Count != netfxPackage.GetParts().Count() - 1)
-                {
-                    Assert.True(false, "Missing parts");
-                }
-                var packageSignature = signatureManager.Signatures[0];
-                Assert.Equal(expectedAlgorithm, packageSignature.Signature.SignedInfo.SignatureMethod);
             }
         }
 
@@ -86,15 +74,6 @@ namespace OpenVsixSignTool.Core.Tests
                 signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
                 var signature = signerBuilder.Sign(HashAlgorithmName.SHA256, new X509Certificate2(@"certs\rsa-2048-sha256.pfx", "test"));
             }
-            using (var netfxPackage = Package.Open(path, FileMode.Open))
-            {
-                var signatureManager = new PackageDigitalSignatureManager(netfxPackage);
-                Assert.Equal(VerifyResult.Success, signatureManager.VerifySignatures(true));
-                if (signatureManager.Signatures.Count != 1 || signatureManager.Signatures[0].SignedParts.Count != netfxPackage.GetParts().Count() - 1)
-                {
-                    Assert.True(false, "Missing parts");
-                }
-            }
         }
 
         [Fact]
@@ -112,17 +91,6 @@ namespace OpenVsixSignTool.Core.Tests
                 var signerBuilder = package.CreateSignatureBuilder();
                 signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
                 signerBuilder.Sign(HashAlgorithmName.SHA256, new X509Certificate2(@"certs\rsa-2048-sha256.pfx", "test"));
-            }
-            using (var netfxPackage = Package.Open(path, FileMode.Open))
-            {
-                var signatureManager = new PackageDigitalSignatureManager(netfxPackage);
-                Assert.Equal(VerifyResult.Success, signatureManager.VerifySignatures(true));
-                if (signatureManager.Signatures.Count != 1 || signatureManager.Signatures[0].SignedParts.Count != netfxPackage.GetParts().Count() - 1)
-                {
-                    Assert.True(false, "Missing parts");
-                }
-                var packageSignature = signatureManager.Signatures[0];
-                Assert.Equal(OpcKnownUris.SignatureAlgorithms.rsaSHA256.AbsoluteUri, packageSignature.Signature.SignedInfo.SignatureMethod);
             }
         }
 
