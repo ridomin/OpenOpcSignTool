@@ -25,8 +25,8 @@ namespace OpenVsixSignTool.Core.Tests
             string path;
             using (var package = ShadowCopyPackage(SamplePackage, out path, OpcPackageFileMode.ReadWrite))
             {
-                var builder = package.CreateSignatureBuilder();
-                builder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var builder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                builder.EnqueueEngineDefaults();
                 var result = await builder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -46,8 +46,8 @@ namespace OpenVsixSignTool.Core.Tests
             string path;
             using (var package = ShadowCopyPackage(SamplePackage, out path, OpcPackageFileMode.ReadWrite))
             {
-                var builder = package.CreateSignatureBuilder();
-                builder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var builder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                builder.EnqueueEngineDefaults();
                 await builder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -89,8 +89,8 @@ namespace OpenVsixSignTool.Core.Tests
         {
             using (var package = ShadowCopyPackage(SamplePackage, out _, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 var signature = await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -111,8 +111,8 @@ namespace OpenVsixSignTool.Core.Tests
             string path;
             using (var package = ShadowCopyPackage(SamplePackage, out path, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -124,8 +124,8 @@ namespace OpenVsixSignTool.Core.Tests
             }
             using (var package = OpcPackage.Open(path, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -152,8 +152,8 @@ namespace OpenVsixSignTool.Core.Tests
             string path;
             using (var package = ShadowCopyPackage(SamplePackage, out path, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -165,8 +165,8 @@ namespace OpenVsixSignTool.Core.Tests
             }
             using (var package = OpcPackage.Open(path, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
@@ -195,8 +195,8 @@ namespace OpenVsixSignTool.Core.Tests
             string path;
             using (var package = ShadowCopyPackage(SamplePackage, out path, OpcPackageFileMode.ReadWrite))
             {
-                var signerBuilder = package.CreateSignatureBuilder();
-                signerBuilder.EnqueueNamedPreset<VSIXSignatureBuilderPreset>();
+                var signerBuilder = package.CreateSignatureBuilder<VSIXPackageSignatureEngine>();
+                signerBuilder.EnqueueEngineDefaults();
                 await signerBuilder.SignAsync(
                     new CertificateSignConfigurationSet
                     {
